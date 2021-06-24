@@ -3,6 +3,7 @@ module github.com/pranotobudi/Go-Akselerasi-Batch3-Project1
 go 1.16
 
 require (
+	github.com/bxcodec/faker/v3 v3.6.0 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-playground/validator/v10 v10.6.1
 	github.com/joho/godotenv v1.3.0

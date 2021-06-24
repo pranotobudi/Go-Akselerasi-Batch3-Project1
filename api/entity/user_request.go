@@ -1,4 +1,4 @@
-package user
+package entity
 
 type RequestUser struct {
 	Name     string `json:"name"`

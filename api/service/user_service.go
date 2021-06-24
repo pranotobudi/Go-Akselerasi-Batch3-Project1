@@ -1,28 +1,30 @@
-package user
+package service
 
 import (
 	"errors"
 	"fmt"
 
+	"github.com/pranotobudi/Go-Akselerasi-Batch3-Project1/api/entity"
+	"github.com/pranotobudi/Go-Akselerasi-Batch3-Project1/api/repository"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type Services interface {
-	CreateUser(req RequestUser) (User, error)
-	CheckExistsEmail(req RequestUser) error
-	AuthUser(req RequestUserLogin) (User, error)
+	CreateUser(req entity.RequestUser) (entity.User, error)
+	CheckExistsEmail(req entity.RequestUser) error
+	AuthUser(req entity.RequestUserLogin) (entity.User, error)
 }
 
 type services struct {
-	repository Repository
+	repository repository.Repository
 }
 
-func NewServices(repository Repository) *services {
+func NewServices(repository repository.Repository) *services {
 	return &services{repository}
 }
 
-func (s *services) CreateUser(req RequestUser) (User, error) {
-	user := User{}
+func (s *services) CreateUser(req entity.RequestUser) (entity.User, error) {
+	user := entity.User{}
 	user.Name = req.Name
 	user.Email = req.Email
 	// user.Password = req.Password
@@ -40,7 +42,7 @@ func (s *services) CreateUser(req RequestUser) (User, error) {
 	return newUser, nil
 }
 
-func (s *services) CheckExistsEmail(req RequestUser) error {
+func (s *services) CheckExistsEmail(req entity.RequestUser) error {
 	email := req.Email
 	if user := s.repository.FindEmail(email); user != nil {
 		return errors.New("email already registered")
@@ -48,7 +50,7 @@ func (s *services) CheckExistsEmail(req RequestUser) error {
 	return nil
 }
 
-func (s *services) AuthUser(req RequestUserLogin) (User, error) {
+func (s *services) AuthUser(req entity.RequestUserLogin) (entity.User, error) {
 	email := req.Email
 	password := req.Password
 	fmt.Println("AUTHUSER CALLED")

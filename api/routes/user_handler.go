@@ -1,26 +1,28 @@
-package user
+package routes
 
 import (
 	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo"
+	"github.com/pranotobudi/Go-Akselerasi-Batch3-Project1/api/entity"
+	"github.com/pranotobudi/Go-Akselerasi-Batch3-Project1/api/service"
 	"github.com/pranotobudi/Go-Akselerasi-Batch3-Project1/auth"
 	"github.com/pranotobudi/Go-Akselerasi-Batch3-Project1/helper"
 )
 
 type userHandler struct {
-	userService Services
+	userService service.Services
 	authService auth.AuthService
 }
 
-func NewHandler(userService Services, authService auth.AuthService) *userHandler {
+func NewHandler(userService service.Services, authService auth.AuthService) *userHandler {
 	return &userHandler{userService, authService}
 }
 
 func (h *userHandler) UserRegistration(c echo.Context) error {
 	// user := &User{}
-	user := new(RequestUser)
+	user := new(entity.RequestUser)
 	if err := c.Bind(user); err != nil {
 		response := helper.ResponseFormatter(http.StatusBadRequest, "error", "invalid request", err.Error())
 		return c.JSON(http.StatusBadRequest, response)
@@ -47,14 +49,14 @@ func (h *userHandler) UserRegistration(c echo.Context) error {
 
 		return c.JSON(http.StatusInternalServerError, response)
 	}
-	userData := UserResponseFormatter(newUser, auth_token)
+	userData := entity.UserResponseFormatter(newUser, auth_token)
 	response := helper.ResponseFormatter(http.StatusOK, "success", "user successfully registered", userData)
 
 	return c.JSON(http.StatusOK, response)
 }
 
 func (u *userHandler) UserLogin(c echo.Context) error {
-	userLogin := new(RequestUserLogin)
+	userLogin := new(entity.RequestUserLogin)
 	if err := c.Bind(userLogin); err != nil {
 		response := helper.ResponseFormatter(http.StatusBadRequest, "error", "invalid request", err.Error())
 		return c.JSON(http.StatusBadRequest, response)
@@ -72,7 +74,7 @@ func (u *userHandler) UserLogin(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, response)
 	}
 
-	userData := UserResponseFormatter(userAuth, auth_token)
+	userData := entity.UserResponseFormatter(userAuth, auth_token)
 
 	response := helper.ResponseFormatter(http.StatusOK, "success", "user authenticated", userData)
 	return c.JSON(http.StatusOK, response)

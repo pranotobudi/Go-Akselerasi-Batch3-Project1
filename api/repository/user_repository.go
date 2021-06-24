@@ -1,13 +1,16 @@
-package user
+package repository
 
-import "gorm.io/gorm"
+import (
+	"github.com/pranotobudi/Go-Akselerasi-Batch3-Project1/api/entity"
+	"gorm.io/gorm"
+)
 
 type UsersStorage []interface{}
 
 type Repository interface {
-	InsertUser(user User) (User, error)
-	FindEmail(email string) *User
-	FindUserByEmail(email string) (User, error)
+	InsertUser(user entity.User) (entity.User, error)
+	FindEmail(email string) *entity.User
+	FindUserByEmail(email string) (entity.User, error)
 }
 
 // var users UsersStorage
@@ -29,7 +32,7 @@ func NewRepository(db *gorm.DB) *repository {
 // 	users = append(users, user)
 // 	return user
 // }
-func (r *repository) InsertUser(user User) (User, error) {
+func (r *repository) InsertUser(user entity.User) (entity.User, error) {
 	err := r.db.Create(&user).Error
 	if err != nil {
 		return user, err
@@ -38,8 +41,8 @@ func (r *repository) InsertUser(user User) (User, error) {
 	return user, nil
 }
 
-func (r *repository) FindEmail(email string) *User {
-	var user User
+func (r *repository) FindEmail(email string) *entity.User {
+	var user entity.User
 	err := r.db.First(&user, "email=?", email).Error
 	if err == nil {
 		return &user
@@ -47,8 +50,8 @@ func (r *repository) FindEmail(email string) *User {
 	return nil
 }
 
-func (r *repository) FindUserByEmail(email string) (User, error) {
-	var user User
+func (r *repository) FindUserByEmail(email string) (entity.User, error) {
+	var user entity.User
 	// err := r.db.Where("email = ?", email).Find(&user).Error
 	err := r.db.First(&user, "email = ?", email).Error
 	if err != nil {

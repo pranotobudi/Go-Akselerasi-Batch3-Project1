@@ -17,5 +17,4 @@ func GetDBInstance() *gorm.DB {
 		log.Fatal("failed to make database connection...")
 	}
 	return db
-
 }

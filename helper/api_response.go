@@ -1,7 +1,5 @@
 package helper
 
-import "github.com/go-playground/validator/v10"
-
 // response
 // meta payload
 
@@ -32,9 +30,10 @@ func ResponseFormatter(code int, status string, message interface{}, data interf
 func ErrorFormatter(err error) []string {
 	var errors []string
 
-	for _, e := range err.(validator.ValidationErrors) {
-		errors = append(errors, e.Error())
-	}
+	// for _, e := range err.(validator.ValidationErrors) {
+	// 	errors = append(errors, e.Error())
+	// }
+	errors = append(errors, err.Error())
 
 	return errors
 }

@@ -2,7 +2,6 @@ package repository
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/bxcodec/faker/v3"
 	"github.com/pranotobudi/Go-Akselerasi-Batch3-Project1/api/entity"
@@ -19,11 +18,6 @@ func DBSeed(db *gorm.DB) error {
 	GenreMoviesDataSeed(db)
 	MovieReviewsDataSeed(db)
 
-	// defaultEventDataSeedInit(db)
-	// defaultTransactionDataSeedInit(db)
-	// userDataSeedInit(totalUser, db)
-	// eventDataSeedInit(totalEvent, totalUser, db)
-	// transactionDataSeedInit(totalTransaction, totalUser, totalEvent, db)
 	return nil
 }
 
@@ -32,7 +26,7 @@ func RoleDataSeed(db *gorm.DB) {
 
 	db.Exec(statement, "admin", faker.Timestamp(), faker.Timestamp(), faker.Timestamp())
 	db.Exec(statement, "member", faker.Timestamp(), faker.Timestamp(), faker.Timestamp())
-	db.Exec(statement, "guest", faker.Timestamp(), faker.Timestamp(), faker.Timestamp())
+	// db.Exec(statement, "guest", faker.Timestamp(), faker.Timestamp(), faker.Timestamp())
 
 }
 
@@ -40,8 +34,8 @@ func UserDataSeed(db *gorm.DB) {
 	statement := "INSERT INTO users (role_id, name, email, password, deleted_at, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)"
 	db.Exec(statement, 1, "name1", "email1@gmail.com", "password1", faker.Timestamp(), faker.Timestamp(), faker.Timestamp())
 	db.Exec(statement, 2, "name2", "email2@gmail.com", "password2", faker.Timestamp(), faker.Timestamp(), faker.Timestamp())
-	db.Exec(statement, 3, "name3", "email3@gmail.com", "password3", faker.Timestamp(), faker.Timestamp(), faker.Timestamp())
-	db.Exec(statement, 2, "name4", "email4@gmail.com", "password4", faker.Timestamp(), faker.Timestamp(), faker.Timestamp())
+	db.Exec(statement, 2, "name3", "email3@gmail.com", "password4", faker.Timestamp(), faker.Timestamp(), faker.Timestamp())
+	// db.Exec(statement, 3, "name3", "email3@gmail.com", "password3", faker.Timestamp(), faker.Timestamp(), faker.Timestamp())
 }
 
 func PermissionDataSeed(db *gorm.DB) {
@@ -84,12 +78,12 @@ func RolePermissionDataSeed(db *gorm.DB) {
 	//MOVIE_REVIEW_UPDATE
 	db.Exec(statement, 9, 2, faker.Timestamp(), faker.Timestamp(), faker.Timestamp())
 
-	//GENRE_GET
-	db.Exec(statement, 4, 3, faker.Timestamp(), faker.Timestamp(), faker.Timestamp())
-	//MOVIE_GET
-	db.Exec(statement, 6, 3, faker.Timestamp(), faker.Timestamp(), faker.Timestamp())
-	//MOVIE_REVIEW_GET
-	db.Exec(statement, 8, 3, faker.Timestamp(), faker.Timestamp(), faker.Timestamp())
+	// //GENRE_GET
+	// db.Exec(statement, 4, 3, faker.Timestamp(), faker.Timestamp(), faker.Timestamp())
+	// //MOVIE_GET
+	// db.Exec(statement, 6, 3, faker.Timestamp(), faker.Timestamp(), faker.Timestamp())
+	// //MOVIE_REVIEW_GET
+	// db.Exec(statement, 8, 3, faker.Timestamp(), faker.Timestamp(), faker.Timestamp())
 }
 
 func GenreDataSeed(db *gorm.DB) {
@@ -134,9 +128,9 @@ func GenreMoviesDataSeed(db *gorm.DB) {
 func MovieReviewsDataSeed(db *gorm.DB) {
 	statement := "INSERT INTO movie_reviews (user_id, movie_id, review, rate, deleted_at, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)"
 	db.Exec(statement, 2, 1, "review1_movie1", 5, faker.Timestamp(), faker.Timestamp(), faker.Timestamp())
-	db.Exec(statement, 4, 1, "review2_movie1", 5, faker.Timestamp(), faker.Timestamp(), faker.Timestamp())
+	db.Exec(statement, 3, 1, "review2_movie1", 5, faker.Timestamp(), faker.Timestamp(), faker.Timestamp())
 	db.Exec(statement, 2, 2, "review1_movie2", 5, faker.Timestamp(), faker.Timestamp(), faker.Timestamp())
-	db.Exec(statement, 4, 2, "review1_movie2", 5, faker.Timestamp(), faker.Timestamp(), faker.Timestamp())
+	db.Exec(statement, 3, 2, "review1_movie2", 5, faker.Timestamp(), faker.Timestamp(), faker.Timestamp())
 	db.Exec(statement, 2, 3, "review1_movie3", 5, faker.Timestamp(), faker.Timestamp(), faker.Timestamp())
 	db.Exec(statement, 2, 4, "review1_movie4", 5, faker.Timestamp(), faker.Timestamp(), faker.Timestamp())
 	db.Exec(statement, 2, 5, "review1_movie5", 5, faker.Timestamp(), faker.Timestamp(), faker.Timestamp())
@@ -205,20 +199,4 @@ func InitDBTable(db *gorm.DB) {
 	}
 	db.Migrator().CreateTable(&entity.MovieReview{})
 
-}
-
-func defaultEventDataSeedInit(db *gorm.DB) {
-	statement := "INSERT INTO events (creator_id, title_event, link_webinar, description, banner, price, quantity, status, event_start_date, event_end_date, campaign_start_date, campaign_end_date, deleted_at, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
-
-	db.Exec(statement, 2, "Event 1", "/event1/webinar", "Event 1 Description", "/banner/url", 25000, 25, "release", time.Now().Add(time.Hour*24+time.Second*10), time.Now().Add(time.Hour*25), time.Now().Add(time.Hour*6), time.Now().Add(time.Hour*12), faker.Timestamp(), faker.Timestamp(), faker.Timestamp())
-	db.Exec(statement, 2, "Event 2", "/event2/webinar", "Event 2 Description", "/banner/url", 25000, 25, "release", time.Now().Add(time.Hour*24+time.Second*15), time.Now().Add(time.Hour*25), time.Now().Add(time.Hour*6), time.Now().Add(time.Hour*12), faker.Timestamp(), faker.Timestamp(), faker.Timestamp())
-	db.Exec(statement, 2, "Event 3", "/event3/webinar", "Event 3 Description", "/banner/url", 25000, 25, "release", time.Now().Add(time.Hour*24+time.Second*20), time.Now().Add(time.Hour*25), time.Now().Add(time.Hour*6), time.Now().Add(time.Hour*12), faker.Timestamp(), faker.Timestamp(), faker.Timestamp())
-}
-
-func defaultTransactionDataSeedInit(db *gorm.DB) {
-	statement := "INSERT INTO transactions (participant_id, creator_id, event_id, amount, status_payment, deleted_at, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
-
-	db.Exec(statement, 3, 2, 1, 100000, "failed", faker.Timestamp(), faker.Timestamp(), faker.Timestamp(), faker.Timestamp())
-	db.Exec(statement, 4, 2, 1, 100000, "passed", faker.Timestamp(), faker.Timestamp(), faker.Timestamp(), faker.Timestamp())
-	db.Exec(statement, 5, 2, 1, 100000, "passed", faker.Timestamp(), faker.Timestamp(), faker.Timestamp(), faker.Timestamp())
 }

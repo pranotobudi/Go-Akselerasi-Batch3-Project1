@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/labstack/echo"
+	"github.com/pranotobudi/Go-Akselerasi-Batch3-Project1/api/handler"
 	"github.com/pranotobudi/Go-Akselerasi-Batch3-Project1/api/repository"
 	"github.com/pranotobudi/Go-Akselerasi-Batch3-Project1/api/service"
 	"github.com/pranotobudi/Go-Akselerasi-Batch3-Project1/auth"
@@ -20,10 +21,10 @@ func (r UserRoutes) Route() []helper.Route {
 	repository.InitDBTable(db)
 	repository.DBSeed(db)
 	// db.AutoMigrate(User{}, Role{}, Permission{}, RolePermission{}, movie.Genre{}, movie.Movie{}, movie.GenreMovie{}, movie.MovieReview{})
-	userRepo := repository.NewRepository(db)
-	userService := service.NewServices(userRepo)
+	repo := repository.NewRepository(db)
+	userService := service.NewServices(repo)
 	authService := auth.NewAuthService()
-	userHandler := NewHandler(userService, authService)
+	userHandler := handler.NewUserHandler(userService, authService)
 
 	return []helper.Route{
 		{
@@ -34,6 +35,16 @@ func (r UserRoutes) Route() []helper.Route {
 		{
 			Method:  echo.POST,
 			Path:    "/login",
+			Handler: userHandler.UserLogin,
+		},
+		{
+			Method:  echo.POST,
+			Path:    "/user",
+			Handler: userHandler.UserLogin,
+		},
+		{
+			Method:  echo.POST,
+			Path:    "/user/:id",
 			Handler: userHandler.UserLogin,
 		},
 		{

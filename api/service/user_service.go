@@ -9,21 +9,21 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type Services interface {
-	CreateUser(req entity.RequestUser) (entity.User, error)
-	CheckExistsEmail(req entity.RequestUser) error
-	AuthUser(req entity.RequestUserLogin) (entity.User, error)
+type UserServices interface {
+	CreateUser(req RequestUser) (entity.User, error)
+	CheckExistsEmail(req RequestUser) error
+	AuthUser(req RequestUserLogin) (entity.User, error)
 }
 
-type services struct {
+type userServices struct {
 	repository repository.Repository
 }
 
-func NewServices(repository repository.Repository) *services {
-	return &services{repository}
+func NewServices(repository repository.Repository) *userServices {
+	return &userServices{repository}
 }
 
-func (s *services) CreateUser(req entity.RequestUser) (entity.User, error) {
+func (s *userServices) CreateUser(req RequestUser) (entity.User, error) {
 	user := entity.User{}
 	user.Name = req.Name
 	user.Email = req.Email
@@ -35,14 +35,14 @@ func (s *services) CreateUser(req entity.RequestUser) (entity.User, error) {
 	}
 	user.Password = string(hashedPassword)
 
-	newUser, err := s.repository.InsertUser(user)
+	newUser, err := s.repository.AddUser(user)
 	if err != nil {
 		return newUser, err
 	}
 	return newUser, nil
 }
 
-func (s *services) CheckExistsEmail(req entity.RequestUser) error {
+func (s *userServices) CheckExistsEmail(req RequestUser) error {
 	email := req.Email
 	if user := s.repository.FindEmail(email); user != nil {
 		return errors.New("email already registered")
@@ -50,12 +50,12 @@ func (s *services) CheckExistsEmail(req entity.RequestUser) error {
 	return nil
 }
 
-func (s *services) AuthUser(req entity.RequestUserLogin) (entity.User, error) {
+func (s *userServices) AuthUser(req RequestUserLogin) (entity.User, error) {
 	email := req.Email
 	password := req.Password
 	fmt.Println("AUTHUSER CALLED")
 
-	user, err := s.repository.FindUserByEmail(email)
+	user, err := s.repository.GetUserByEmail(email)
 	if err != nil {
 		return user, errors.New("email not registered")
 	}

@@ -1,17 +1,15 @@
 package routes
 
 import (
-	"log"
-
 	"github.com/labstack/echo"
-	"github.com/pranotobudi/Go-Akselerasi-Batch3-Project1/helper"
 	"github.com/pranotobudi/Go-Akselerasi-Batch3-Project1/api/routes"
+	"github.com/pranotobudi/Go-Akselerasi-Batch3-Project1/helper"
 )
 
 func DefineApiRoutes(e *echo.Echo) {
 	handlers := []helper.Handler{
-		routes.UserRoutes{},
-		routes.
+		// routes.UserRoutes{},
+		routes.MovieRoutes{},
 	}
 
 	var routes []helper.Route

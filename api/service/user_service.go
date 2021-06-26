@@ -13,6 +13,7 @@ type UserServices interface {
 	CreateUser(req RequestUser) (entity.User, error)
 	CheckExistsEmail(req RequestUser) error
 	AuthUser(req RequestUserLogin) (entity.User, error)
+	GetRole(userID uint) (string, error)
 }
 
 type userServices struct {
@@ -27,6 +28,8 @@ func (s *userServices) CreateUser(req RequestUser) (entity.User, error) {
 	user := entity.User{}
 	user.Name = req.Name
 	user.Email = req.Email
+	user.RoleID = req.RoleID
+
 	// user.Password = req.Password
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
@@ -48,6 +51,15 @@ func (s *userServices) CheckExistsEmail(req RequestUser) error {
 		return errors.New("email already registered")
 	}
 	return nil
+}
+
+func (s *userServices) GetRole(userID uint) (string, error) {
+	role, err := s.repository.FindRole(userID)
+	fmt.Printf("\n Service: userID: %v ROLE: %+v \n", userID, role)
+	if err != nil {
+		return role, errors.New("role not found")
+	}
+	return role, nil
 }
 
 func (s *userServices) AuthUser(req RequestUserLogin) (entity.User, error) {

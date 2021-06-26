@@ -1,13 +1,16 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo"
 	"github.com/pranotobudi/Go-Akselerasi-Batch3-Project1/api/service"
 	"github.com/pranotobudi/Go-Akselerasi-Batch3-Project1/auth"
 	"github.com/pranotobudi/Go-Akselerasi-Batch3-Project1/helper"
+	"github.com/pranotobudi/Go-Akselerasi-Batch3-Project1/middleware"
 )
 
 type movieHandler struct {
@@ -39,14 +42,7 @@ func (h *movieHandler) AddGenre(c echo.Context) error {
 
 		return c.JSON(http.StatusBadRequest, response)
 	}
-	auth_token, err := h.authService.GetAccessToken(newGenre.ID)
-	if err != nil {
-		response := helper.ResponseFormatter(http.StatusInternalServerError, "error", err.Error(), nil)
-
-		return c.JSON(http.StatusInternalServerError, response)
-	}
-
-	userData := service.GenreResponseFormatter(newGenre, auth_token)
+	userData := service.GenreResponseFormatter(newGenre)
 	response := helper.ResponseFormatter(http.StatusOK, "success", "new genre successfully added", userData)
 
 	return c.JSON(http.StatusOK, response)
@@ -62,21 +58,15 @@ func (h *movieHandler) GetAllGenres(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, response)
 	}
 	// auth_token, err := h.authService.GetAccessToken(newGenre.ID)
-	if err != nil {
-		response := helper.ResponseFormatter(http.StatusInternalServerError, "error", err.Error(), nil)
+	// if err != nil {
+	// 	response := helper.ResponseFormatter(http.StatusInternalServerError, "error", err.Error(), nil)
 
-		return c.JSON(http.StatusInternalServerError, response)
-	}
+	// 	return c.JSON(http.StatusInternalServerError, response)
+	// }
+
 	var finalUserData []service.ResponseGenre
 	for _, genre := range genres {
-		auth_token, err := h.authService.GetAccessToken(genre.ID)
-		if err != nil {
-			response := helper.ResponseFormatter(http.StatusInternalServerError, "error", err.Error(), nil)
-
-			return c.JSON(http.StatusInternalServerError, response)
-		}
-
-		userData := service.GenreResponseFormatter(genre, auth_token)
+		userData := service.GenreResponseFormatter(genre)
 		finalUserData = append(finalUserData, userData)
 	}
 	response := helper.ResponseFormatter(http.StatusOK, "success", "get all genres succeeded", finalUserData)
@@ -105,14 +95,7 @@ func (h *movieHandler) AddMovie(c echo.Context) error {
 
 		return c.JSON(http.StatusBadRequest, response)
 	}
-	auth_token, err := h.authService.GetAccessToken(newMovie.ID)
-	if err != nil {
-		response := helper.ResponseFormatter(http.StatusInternalServerError, "error", err.Error(), nil)
-
-		return c.JSON(http.StatusInternalServerError, response)
-	}
-
-	userData := service.MovieResponseFormatter(newMovie, auth_token)
+	userData := service.MovieResponseFormatter(newMovie)
 	response := helper.ResponseFormatter(http.StatusOK, "success", "movie successfully added", userData)
 
 	return c.JSON(http.StatusOK, response)
@@ -128,20 +111,14 @@ func (h *movieHandler) GetAllMovies(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, response)
 	}
 	// auth_token, err := h.authService.GetAccessToken(newGenre.ID)
-	if err != nil {
-		response := helper.ResponseFormatter(http.StatusInternalServerError, "error", err.Error(), nil)
+	// if err != nil {
+	// 	response := helper.ResponseFormatter(http.StatusInternalServerError, "error", err.Error(), nil)
 
-		return c.JSON(http.StatusInternalServerError, response)
-	}
+	// 	return c.JSON(http.StatusInternalServerError, response)
+	// }
 	var finalUserData []service.ResponseMovie
 	for _, movie := range movies {
-		auth_token, err := h.authService.GetAccessToken(movie.ID)
-		if err != nil {
-			response := helper.ResponseFormatter(http.StatusInternalServerError, "error", err.Error(), nil)
-
-			return c.JSON(http.StatusInternalServerError, response)
-		}
-		userData := service.MovieResponseFormatter(movie, auth_token)
+		userData := service.MovieResponseFormatter(movie)
 		finalUserData = append(finalUserData, userData)
 	}
 	response := helper.ResponseFormatter(http.StatusOK, "success", "get all movies succeeded", finalUserData)
@@ -169,14 +146,8 @@ func (h *movieHandler) AddGenreMovie(c echo.Context) error {
 
 		return c.JSON(http.StatusBadRequest, response)
 	}
-	auth_token, err := h.authService.GetAccessToken(newGenreMovie.ID)
-	if err != nil {
-		response := helper.ResponseFormatter(http.StatusInternalServerError, "error", err.Error(), nil)
 
-		return c.JSON(http.StatusInternalServerError, response)
-	}
-
-	userData := service.GenreMovieResponseFormatter(newGenreMovie, auth_token)
+	userData := service.GenreMovieResponseFormatter(newGenreMovie)
 	response := helper.ResponseFormatter(http.StatusOK, "success", "add genre movie succeeded", userData)
 
 	return c.JSON(http.StatusOK, response)
@@ -196,14 +167,8 @@ func (h *movieHandler) AddMovieReview(c echo.Context) error {
 
 		return c.JSON(http.StatusBadRequest, response)
 	}
-	auth_token, err := h.authService.GetAccessToken(newMovieReview.ID)
-	if err != nil {
-		response := helper.ResponseFormatter(http.StatusInternalServerError, "error", err.Error(), nil)
 
-		return c.JSON(http.StatusInternalServerError, response)
-	}
-
-	userData := service.MovieReviewResponseFormatter(newMovieReview, auth_token)
+	userData := service.MovieReviewResponseFormatter(newMovieReview)
 	response := helper.ResponseFormatter(http.StatusOK, "success", "movie review successfully added", userData)
 
 	return c.JSON(http.StatusOK, response)
@@ -220,19 +185,25 @@ func (h *movieHandler) GetMoviewReview(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, response)
 	}
 	// auth_token, err := h.authService.GetAccessToken(newGenre.ID)
-	if err != nil {
-		response := helper.ResponseFormatter(http.StatusInternalServerError, "error", err.Error(), nil)
+	// if err != nil {
+	// 	response := helper.ResponseFormatter(http.StatusInternalServerError, "error", err.Error(), nil)
 
-		return c.JSON(http.StatusInternalServerError, response)
-	}
-	auth_token, err := h.authService.GetAccessToken(movieReview.ID)
-	if err != nil {
-		response := helper.ResponseFormatter(http.StatusInternalServerError, "error", err.Error(), nil)
-
-		return c.JSON(http.StatusInternalServerError, response)
-	}
-	userData := service.MovieReviewResponseFormatter(*movieReview, auth_token)
+	// 	return c.JSON(http.StatusInternalServerError, response)
+	// }
+	userData := service.MovieReviewResponseFormatter(*movieReview)
 	response := helper.ResponseFormatter(http.StatusOK, "success", "get movie review successfull", userData)
 
 	return c.JSON(http.StatusOK, response)
+}
+
+func (h *movieHandler) AdminAllowedAccess(c echo.Context) error {
+	user := c.Get("user").(*jwt.Token)
+	claims := user.Claims.(*middleware.JwtCustomClaims)
+	role := claims.Role
+	id := claims.ID
+	if role != "admin" {
+		return c.String(http.StatusForbidden, fmt.Sprintf("\n Access not allowed for this id: %v role:%s!\n", id, role))
+	}
+	return c.String(http.StatusOK, fmt.Sprintf("\n Welcome %s! \n", role))
+
 }

@@ -4,6 +4,7 @@ type RequestUser struct {
 	Name     string `json:"name"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
+	RoleID   uint   `json:"role_id"`
 }
 type RequestGenre struct {
 	UserID uint   `json:"user_id"`

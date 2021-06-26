@@ -10,6 +10,7 @@ import (
 	"github.com/pranotobudi/Go-Akselerasi-Batch3-Project1/auth"
 	"github.com/pranotobudi/Go-Akselerasi-Batch3-Project1/database"
 	"github.com/pranotobudi/Go-Akselerasi-Batch3-Project1/helper"
+	"github.com/pranotobudi/Go-Akselerasi-Batch3-Project1/middleware"
 )
 
 type MovieRoutes struct{}
@@ -30,36 +31,64 @@ func (r MovieRoutes) Route() []helper.Route {
 			Method:  echo.POST,
 			Path:    "/genre", //PASS
 			Handler: movieHandler.AddGenre,
+			Middleware: []echo.MiddlewareFunc{
+				middleware.JwtMiddleWare(),
+				middleware.RoleAccessMiddleware("admin"),
+			},
 		},
 		{
 			Method:  echo.GET,
-			Path:    "/genre", //ONLY 1 ROW, NOT ALL, CHECK AGAIN
+			Path:    "/genre", //PASS
 			Handler: movieHandler.GetAllGenres,
+			Middleware: []echo.MiddlewareFunc{
+				middleware.JwtMiddleWare(),
+				middleware.RoleAccessMiddleware("admin", "member"),
+			},
 		},
 		{
 			Method:  echo.POST,
 			Path:    "/movie", //PASS
 			Handler: movieHandler.AddMovie,
+			Middleware: []echo.MiddlewareFunc{
+				middleware.JwtMiddleWare(),
+				middleware.RoleAccessMiddleware("admin"),
+			},
 		},
 		{
 			Method:  echo.GET,
-			Path:    "/movie", // CAN'T ACCESS TABLE
+			Path:    "/movie", // PASS
 			Handler: movieHandler.GetAllMovies,
+			Middleware: []echo.MiddlewareFunc{
+				middleware.JwtMiddleWare(),
+				middleware.RoleAccessMiddleware("admin", "member"),
+			},
 		},
 		{
 			Method:  echo.POST,
 			Path:    "/genre-movie", // PASS
 			Handler: movieHandler.AddGenreMovie,
+			Middleware: []echo.MiddlewareFunc{
+				middleware.JwtMiddleWare(),
+				middleware.RoleAccessMiddleware("admin"),
+			},
 		},
 		{
 			Method:  echo.POST,
 			Path:    "/review", // PASS
 			Handler: movieHandler.AddMovieReview,
+			Middleware: []echo.MiddlewareFunc{
+				middleware.JwtMiddleWare(),
+				middleware.RoleAccessMiddleware("member"),
+			},
 		},
 		{
 			Method:  echo.GET,
 			Path:    "/review/:id", // CHECK AGAIN
 			Handler: movieHandler.GetMoviewReview,
+			Middleware: []echo.MiddlewareFunc{
+				middleware.JwtMiddleWare(),
+				middleware.RoleAccessMiddleware("admin", "member"),
+			},
 		},
 	}
 }

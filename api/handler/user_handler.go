@@ -42,7 +42,10 @@ func (h *userHandler) UserRegistration(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, response)
 	}
 
-	auth_token, err := h.authService.GetAccessToken(newUser.ID)
+	role, _ := h.userService.GetRole(newUser.ID)
+	fmt.Printf("\n Handler: userID: %v ROLE: %+v \n", newUser.ID, role)
+
+	auth_token, err := h.authService.GetAccessToken(newUser.ID, role)
 	if err != nil {
 		response := helper.ResponseFormatter(http.StatusInternalServerError, "error", err.Error(), nil)
 
@@ -66,7 +69,9 @@ func (u *userHandler) UserLogin(c echo.Context) error {
 		response := helper.ResponseFormatter(http.StatusUnauthorized, "error", err.Error(), nil)
 		return c.JSON(http.StatusUnauthorized, response)
 	}
-	auth_token, err := u.authService.GetAccessToken(userAuth.ID)
+	role, _ := u.userService.GetRole(userAuth.ID)
+
+	auth_token, err := u.authService.GetAccessToken(userAuth.ID, role)
 	if err != nil {
 		response := helper.ResponseFormatter(http.StatusInternalServerError, "error", err.Error(), nil)
 

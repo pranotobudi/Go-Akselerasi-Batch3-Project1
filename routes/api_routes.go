@@ -8,7 +8,7 @@ import (
 
 func DefineApiRoutes(e *echo.Echo) {
 	handlers := []helper.Handler{
-		// routes.UserRoutes{},
+		routes.UserRoutes{},
 		routes.MovieRoutes{},
 	}
 

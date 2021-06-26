@@ -9,7 +9,7 @@ import (
 )
 
 type AuthService interface {
-	GetAccessToken(userID uint) (string, error)
+	GetAccessToken(userID uint, role string) (string, error)
 }
 
 type authService struct {
@@ -19,9 +19,10 @@ func NewAuthService() *authService {
 	return &authService{}
 }
 
-func (s *authService) GetAccessToken(userID uint) (string, error) {
+func (s *authService) GetAccessToken(userID uint, role string) (string, error) {
 	claims := &middleware.JwtCustomClaims{
-		ID: userID,
+		ID:   userID,
+		Role: role,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(time.Hour * 3).Unix(),
 			IssuedAt:  time.Now().Unix(),

@@ -71,12 +71,11 @@ func UserResponseFormatter(user entity.User, auth_token string) ResponseUser {
 	return formatter
 }
 
-func GenreResponseFormatter(genre entity.Genre, auth_token string) ResponseGenre {
+func GenreResponseFormatter(genre entity.Genre) ResponseGenre {
 	formatter := ResponseGenre{
 		ID:        genre.ID,
 		UserID:    genre.UserID,
 		Name:      genre.Name,
-		AuthToken: auth_token,
 		CreatedAt: genre.CreatedAt,
 		UpdatedAt: genre.UpdatedAt,
 		DeletedAt: genre.DeletedAt,
@@ -84,14 +83,13 @@ func GenreResponseFormatter(genre entity.Genre, auth_token string) ResponseGenre
 	return formatter
 }
 
-func MovieResponseFormatter(movie entity.Movie, auth_token string) ResponseMovie {
+func MovieResponseFormatter(movie entity.Movie) ResponseMovie {
 	formatter := ResponseMovie{
 		ID:        movie.ID,
 		UserID:    movie.UserID,
 		Title:     movie.Title,
 		Year:      movie.Year,
 		Rating:    movie.Rating,
-		AuthToken: auth_token,
 		CreatedAt: movie.CreatedAt,
 		UpdatedAt: movie.UpdatedAt,
 		DeletedAt: movie.DeletedAt,
@@ -99,12 +97,11 @@ func MovieResponseFormatter(movie entity.Movie, auth_token string) ResponseMovie
 	return formatter
 }
 
-func GenreMovieResponseFormatter(genreMovie entity.GenreMovie, auth_token string) ResponseGenreMovie {
+func GenreMovieResponseFormatter(genreMovie entity.GenreMovie) ResponseGenreMovie {
 	formatter := ResponseGenreMovie{
 		ID:        genreMovie.ID,
 		GenreID:   genreMovie.GenreID,
 		MovieID:   genreMovie.MovieID,
-		AuthToken: auth_token,
 		CreatedAt: genreMovie.CreatedAt,
 		UpdatedAt: genreMovie.UpdatedAt,
 		DeletedAt: genreMovie.DeletedAt,
@@ -112,7 +109,7 @@ func GenreMovieResponseFormatter(genreMovie entity.GenreMovie, auth_token string
 	return formatter
 }
 
-func MovieReviewResponseFormatter(movieReview entity.MovieReview, auth_token string) ResponseMovieReview {
+func MovieReviewResponseFormatter(movieReview entity.MovieReview) ResponseMovieReview {
 	formatter := ResponseMovieReview{
 
 		ID:        movieReview.ID,
@@ -120,7 +117,6 @@ func MovieReviewResponseFormatter(movieReview entity.MovieReview, auth_token str
 		MovieID:   movieReview.MovieID,
 		Review:    movieReview.Review,
 		Rate:      movieReview.Rate,
-		AuthToken: auth_token,
 		CreatedAt: movieReview.CreatedAt,
 		UpdatedAt: movieReview.UpdatedAt,
 		DeletedAt: movieReview.DeletedAt,

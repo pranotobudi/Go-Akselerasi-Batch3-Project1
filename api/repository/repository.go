@@ -24,6 +24,7 @@ type Repository interface {
 	AddGenreMovie(genreMovie entity.GenreMovie) (entity.GenreMovie, error)
 	GetMovieReview(id uint) (*entity.MovieReview, error)
 	AddMovieReview(movieReview entity.MovieReview) (entity.MovieReview, error)
+	FindRole(userID uint) (string, error)
 }
 
 // var users UsersStorage
@@ -171,4 +172,13 @@ func (r *repository) GetMovieReview(id uint) (*entity.MovieReview, error) {
 		return &movieReview, err
 	}
 	return nil, err
+}
+
+func (r *repository) FindRole(userID uint) (string, error) {
+	var role string
+	statement := "SELECT roles.role FROM users JOIN roles ON users.role_id=roles.id WHERE users.id = ?"
+	//take tomorrow events which happen for the next 23-24 hours.
+	result := r.db.Raw(statement, userID).Find(&role)
+	fmt.Printf("\n Repository: userID: %v ROLE: %+v \n", userID, role)
+	return role, result.Error
 }

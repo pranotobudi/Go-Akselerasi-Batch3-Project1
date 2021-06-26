@@ -11,6 +11,7 @@ type ResponseUser struct {
 	ID        uint           `json:"id"`
 	Name      string         `json:"name"`
 	Email     string         `json:"email"`
+	RoleID    uint           `json:"role_id"`
 	AuthToken string         `json:"auth_token"`
 	CreatedAt time.Time      `json:"created_at"`
 	UpdatedAt time.Time      `json:"updated_at"`
@@ -61,8 +62,10 @@ type ResponseMovieReview struct {
 
 func UserResponseFormatter(user entity.User, auth_token string) ResponseUser {
 	formatter := ResponseUser{
+		ID:        user.ID,
 		Name:      user.Name,
 		Email:     user.Email,
+		RoleID:    user.RoleID,
 		AuthToken: auth_token,
 		CreatedAt: user.CreatedAt,
 		UpdatedAt: user.UpdatedAt,

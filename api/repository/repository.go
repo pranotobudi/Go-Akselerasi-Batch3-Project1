@@ -25,6 +25,9 @@ type Repository interface {
 	GetMovieReview(id uint) (*entity.MovieReview, error)
 	AddMovieReview(movieReview entity.MovieReview) (entity.MovieReview, error)
 	FindRole(userID uint) (string, error)
+	GetAllUsers() ([]entity.User, error)
+	GetUser(email string) (*entity.User, error)
+	UpdateUser(newUser entity.User) (entity.User, error)
 }
 
 // var users UsersStorage
@@ -171,7 +174,7 @@ func (r *repository) GetMovieReview(id uint) (*entity.MovieReview, error) {
 	if err != nil {
 		return &movieReview, err
 	}
-	return nil, err
+	return &movieReview, nil
 }
 
 func (r *repository) FindRole(userID uint) (string, error) {
@@ -181,4 +184,33 @@ func (r *repository) FindRole(userID uint) (string, error) {
 	result := r.db.Raw(statement, userID).Find(&role)
 	fmt.Printf("\n Repository: userID: %v ROLE: %+v \n", userID, role)
 	return role, result.Error
+}
+
+func (r *repository) GetAllUsers() ([]entity.User, error) {
+	var users []entity.User
+	result := r.db.Find(&users)
+	if result.Error != nil {
+		return users, result.Error
+	} else if result.RowsAffected < 1 {
+		return users, fmt.Errorf("table is empty")
+	}
+	return users, nil
+}
+
+func (r *repository) GetUser(email string) (*entity.User, error) {
+	var user entity.User
+	err := r.db.First(&user, "email=?", email).Error
+	if err != nil {
+		return &user, err
+	}
+	return &user, nil
+}
+
+func (r *repository) UpdateUser(newUser entity.User) (entity.User, error) {
+	err := r.db.Save(&newUser).Error
+	if err != nil {
+		return newUser, err
+	}
+	// users = append(users, user)
+	return newUser, nil
 }

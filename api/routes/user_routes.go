@@ -38,14 +38,19 @@ func (r UserRoutes) Route() []helper.Route {
 			Handler: userHandler.UserLogin,
 		},
 		{
-			Method:  echo.POST,
-			Path:    "/user",
-			Handler: userHandler.UserLogin,
+			Method:  echo.GET,
+			Path:    "/users",
+			Handler: userHandler.GetAlUsers,
 		},
 		{
-			Method:  echo.POST,
-			Path:    "/user/:id",
-			Handler: userHandler.UserLogin,
+			Method:  echo.GET,
+			Path:    "/user",
+			Handler: userHandler.GetUser,
+		},
+		{
+			Method:  echo.PUT,
+			Path:    "/user",
+			Handler: userHandler.UpdateUser,
 		},
 		{
 			Method:     echo.GET,

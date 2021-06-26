@@ -14,6 +14,10 @@ type UserServices interface {
 	CheckExistsEmail(req RequestUser) error
 	AuthUser(req RequestUserLogin) (entity.User, error)
 	GetRole(userID uint) (string, error)
+	GetAllUsers() ([]entity.User, error)
+	GetUser(email string) (*entity.User, error)
+	UpdateUser(req RequestUser) (entity.User, error)
+	CheckUserExists(req RequestUser) (bool, error)
 }
 
 type userServices struct {
@@ -53,6 +57,14 @@ func (s *userServices) CheckExistsEmail(req RequestUser) error {
 	return nil
 }
 
+func (s *userServices) CheckUserExists(req RequestUser) (bool, error) {
+	email := req.Email
+	if user := s.repository.FindEmail(email); user != nil {
+		return true, errors.New("user already registered")
+	}
+	return false, errors.New("user not registered")
+}
+
 func (s *userServices) GetRole(userID uint) (string, error) {
 	role, err := s.repository.FindRole(userID)
 	fmt.Printf("\n Service: userID: %v ROLE: %+v \n", userID, role)
@@ -78,4 +90,36 @@ func (s *userServices) AuthUser(req RequestUserLogin) (entity.User, error) {
 		return user, errors.New("invalid email or password")
 	}
 	return user, nil
+}
+
+func (s *userServices) GetAllUsers() ([]entity.User, error) {
+	users, err := s.repository.GetAllUsers()
+	if err != nil {
+		return users, err
+	}
+	return users, nil
+}
+
+func (s *userServices) GetUser(email string) (*entity.User, error) {
+	user, err := s.repository.GetUser(email)
+	if err != nil {
+		return user, err
+	}
+	return user, nil
+}
+
+func (s *userServices) UpdateUser(req RequestUser) (entity.User, error) {
+	user := entity.User{}
+	user.ID = req.ID
+	user.Email = req.Email
+	user.Name = req.Name
+	user.Password = req.Password
+	user.RoleID = req.RoleID
+
+	newUser, err := s.repository.UpdateUser(user)
+	if err != nil {
+		return newUser, err
+	}
+	return newUser, nil
+
 }

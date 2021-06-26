@@ -27,7 +27,9 @@ type Repository interface {
 	FindRole(userID uint) (string, error)
 	GetAllUsers() ([]entity.User, error)
 	GetUser(email string) (*entity.User, error)
+	GetRegistration(email string) (*entity.Registration, error)
 	UpdateUser(newUser entity.User) (entity.User, error)
+	AddRegistration(registration entity.Registration) (entity.Registration, error)
 }
 
 // var users UsersStorage
@@ -205,6 +207,14 @@ func (r *repository) GetUser(email string) (*entity.User, error) {
 	}
 	return &user, nil
 }
+func (r *repository) GetRegistration(email string) (*entity.Registration, error) {
+	var registration entity.Registration
+	err := r.db.First(&registration, "email=?", email).Error
+	if err != nil {
+		return &registration, err
+	}
+	return &registration, nil
+}
 
 func (r *repository) UpdateUser(newUser entity.User) (entity.User, error) {
 	err := r.db.Save(&newUser).Error
@@ -213,4 +223,13 @@ func (r *repository) UpdateUser(newUser entity.User) (entity.User, error) {
 	}
 	// users = append(users, user)
 	return newUser, nil
+}
+
+func (r *repository) AddRegistration(registration entity.Registration) (entity.Registration, error) {
+	err := r.db.Create(&registration).Error
+	if err != nil {
+		return registration, err
+	}
+	return registration, nil
+
 }

@@ -3,6 +3,7 @@ package service
 import (
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/pranotobudi/Go-Akselerasi-Batch3-Project1/api/entity"
 	"github.com/pranotobudi/Go-Akselerasi-Batch3-Project1/api/repository"
@@ -16,8 +17,10 @@ type UserServices interface {
 	GetRole(userID uint) (string, error)
 	GetAllUsers() ([]entity.User, error)
 	GetUser(email string) (*entity.User, error)
+	GetRegistration(email string) (*entity.Registration, error)
 	UpdateUser(req RequestUser) (entity.User, error)
 	CheckUserExists(req RequestUser) (bool, error)
+	AddRegistrationSendEmail(req RequestUser, regToken string) (entity.Registration, error)
 }
 
 type userServices struct {
@@ -108,6 +111,14 @@ func (s *userServices) GetUser(email string) (*entity.User, error) {
 	return user, nil
 }
 
+func (s *userServices) GetRegistration(email string) (*entity.Registration, error) {
+	registration, err := s.repository.GetRegistration(email)
+	if err != nil {
+		return registration, err
+	}
+	return registration, nil
+}
+
 func (s *userServices) UpdateUser(req RequestUser) (entity.User, error) {
 	user := entity.User{}
 	user.ID = req.ID
@@ -122,4 +133,18 @@ func (s *userServices) UpdateUser(req RequestUser) (entity.User, error) {
 	}
 	return newUser, nil
 
+}
+
+func (s *userServices) AddRegistrationSendEmail(req RequestUser, regToken string) (entity.Registration, error) {
+	registration := entity.Registration{}
+	registration.ID = req.ID
+	registration.Email = req.Email
+	registration.Name = req.Name
+	registration.Password = req.Password
+	registration.RoleID = req.RoleID
+	registration.RegistrationToken = regToken
+	registration.TimeCreated = time.Now()
+
+	registration, err := s.repository.AddRegistration(registration)
+	return registration, err
 }

@@ -28,9 +28,15 @@ func (r UserRoutes) Route() []helper.Route {
 
 	return []helper.Route{
 		{
-			Method:  echo.POST,
-			Path:    "/register",
-			Handler: userHandler.UserRegistration,
+			Method: echo.POST,
+			Path:   "/register",
+			// Handler: userHandler.UserRegistration,
+			Handler: userHandler.UserRegistrationSendEmail,
+		},
+		{
+			Method:  echo.GET,
+			Path:    "/register/confirmation",
+			Handler: userHandler.UserRegisterConfirmation,
 		},
 		{
 			Method:  echo.POST,
@@ -40,7 +46,7 @@ func (r UserRoutes) Route() []helper.Route {
 		{
 			Method:  echo.GET,
 			Path:    "/users",
-			Handler: userHandler.GetAlUsers,
+			Handler: userHandler.GetAllUsers,
 		},
 		{
 			Method:  echo.GET,

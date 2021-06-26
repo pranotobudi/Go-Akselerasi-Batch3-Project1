@@ -8,6 +8,7 @@ import (
 	"github.com/pranotobudi/Go-Akselerasi-Batch3-Project1/api/service"
 	"github.com/pranotobudi/Go-Akselerasi-Batch3-Project1/auth"
 	"github.com/pranotobudi/Go-Akselerasi-Batch3-Project1/helper"
+	"github.com/thanhpk/randstr"
 )
 
 type userHandler struct {
@@ -90,7 +91,7 @@ func (h *userHandler) SecretResource(c echo.Context) error {
 	return c.JSON(http.StatusOK, response)
 }
 
-func (h *userHandler) GetAlUsers(c echo.Context) error {
+func (h *userHandler) GetAllUsers(c echo.Context) error {
 	users, err := h.userService.GetAllUsers()
 	if err != nil {
 		errorFormatter := helper.ErrorFormatter(err)
@@ -176,4 +177,90 @@ func (h *userHandler) UpdateUser(c echo.Context) error {
 	response := helper.ResponseFormatter(http.StatusOK, "success", "user successfully updated", userData)
 
 	return c.JSON(http.StatusOK, response)
+}
+
+func (h *userHandler) UserRegistrationSendEmail(c echo.Context) error {
+	user := new(service.RequestUser)
+	if err := c.Bind(user); err != nil {
+		response := helper.ResponseFormatter(http.StatusBadRequest, "error", "invalid request", err.Error())
+		return c.JSON(http.StatusBadRequest, response)
+	}
+	// c.JSON(http.StatusOK, user)
+
+	// db := c.Value("db")
+
+	//Send Confirmation Email
+	regToken := randstr.Hex(16) // generate 128-bit hex string
+	newRegistration, err := h.userService.AddRegistrationSendEmail(*user, regToken)
+	if err != nil {
+		response := helper.ResponseFormatter(http.StatusBadRequest, "error", "ragistration send email failed", err.Error())
+		return c.JSON(http.StatusBadRequest, response)
+	}
+	msg := []byte("To: oceankingdigital@gmail.com\r\n" +
+		"Subject: Registration Confirmation Email from Movie Review App!\r\n" +
+		"\r\n" +
+		"This is the email body.\r\n" +
+		"http://localhost:8080/api/v1/movie_reviews/register/confirmation?email=" + user.Email + "&token=" + regToken)
+
+	toEmail := []string{"oceankingdigital@gmail.com"}
+	helper.SendEmail(toEmail, msg)
+
+	userData := newRegistration
+	response := helper.ResponseFormatter(http.StatusOK, "success", "registration send email successfull", userData)
+
+	return c.JSON(http.StatusOK, response)
+
+}
+
+func (h *userHandler) UserRegisterConfirmation(c echo.Context) error {
+	email := c.QueryParam("email")
+	token := c.QueryParam("token")
+	fmt.Println("INSIDE userHandler:UserRegisterConfirmation email:", email, " token: ", token)
+	registration, err := h.userService.GetRegistration(email)
+	if err != nil {
+		errorFormatter := helper.ErrorFormatter(err)
+		errorMessage := helper.M{"errors": errorFormatter}
+		response := helper.ResponseFormatter(http.StatusBadRequest, "error", errorMessage, nil)
+
+		return c.JSON(http.StatusBadRequest, response)
+	}
+
+	if registration.RegistrationToken != token {
+		errorFormatter := helper.ErrorFormatter(fmt.Errorf("token is not valid"))
+		errorMessage := helper.M{"errors": errorFormatter}
+		response := helper.ResponseFormatter(http.StatusBadRequest, "error", errorMessage, nil)
+
+		return c.JSON(http.StatusBadRequest, response)
+
+	}
+
+	// Add to User Table
+	user := new(service.RequestUser)
+	user.Email = registration.Email
+	user.Name = registration.Name
+	user.Password = registration.Password
+	user.RoleID = registration.RoleID
+	newUser, _ := h.userService.CreateUser(*user)
+	if err != nil {
+		errorFormatter := helper.ErrorFormatter(err)
+		errorMessage := helper.M{"errors": errorFormatter}
+		response := helper.ResponseFormatter(http.StatusBadRequest, "error", errorMessage, nil)
+
+		return c.JSON(http.StatusBadRequest, response)
+	}
+
+	// Send response
+
+	role, _ := h.userService.GetRole(newUser.ID)
+	auth_token, err := h.authService.GetAccessToken(newUser.ID, role)
+	if err != nil {
+		response := helper.ResponseFormatter(http.StatusInternalServerError, "error", err.Error(), nil)
+
+		return c.JSON(http.StatusInternalServerError, response)
+	}
+	userData := service.UserResponseFormatter(newUser, auth_token)
+	response := helper.ResponseFormatter(http.StatusOK, "success", "registration confirmation successfull, user created", userData)
+
+	return c.JSON(http.StatusOK, response)
+
 }

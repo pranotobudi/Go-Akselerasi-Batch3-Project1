@@ -1,6 +1,8 @@
 package entity
 
 import (
+	"time"
+
 	"gorm.io/gorm"
 )
 
@@ -29,4 +31,14 @@ type User struct {
 	Genres       []Genre       `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	Movies       []Movie       `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	MovieReviews []MovieReview `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+}
+
+type Registration struct {
+	gorm.Model
+	RoleID            uint
+	Name              string
+	Email             string
+	Password          string
+	RegistrationToken string
+	TimeCreated       time.Time
 }

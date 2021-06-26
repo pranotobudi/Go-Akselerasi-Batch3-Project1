@@ -144,7 +144,14 @@ func MovieReviewsDataSeed(db *gorm.DB) {
 }
 func InitDBTable(db *gorm.DB) {
 	// db.AutoMigrate(&User{}, &Event{}, &Transaction{}, &Registration{})
-	// db.AutoMigrate(User{}, Role{}, Permission{}, RolePermission{}, movie.Genre{}, movie.Movie{}, movie.GenreMovie{}, movie.MovieReview{})
+	// db.AutoMigrate(entity.Registration{}, entity.User{}, entity.Role{}, entity.Permission{}, entity.RolePermission{}, entity.Genre{}, entity.Movie{}, entity.GenreMovie{}, entity.MovieReview{})
+
+	// Create Fresh Registration Table
+	if (db.Migrator().HasTable(&entity.Registration{})) {
+		fmt.Println("Registration table exist")
+		db.Migrator().DropTable(&entity.Registration{})
+	}
+	db.Migrator().CreateTable(&entity.Registration{})
 
 	// Create Fresh User Table
 	if (db.Migrator().HasTable(&entity.User{})) {

@@ -22,7 +22,7 @@ func (r UserRoutes) Route() []helper.Route {
 	repository.DBSeed(db)
 	// db.AutoMigrate(User{}, Role{}, Permission{}, RolePermission{}, movie.Genre{}, movie.Movie{}, movie.GenreMovie{}, movie.MovieReview{})
 	repo := repository.NewRepository(db)
-	userService := service.NewServices(repo)
+	userService := service.NewUserServices(repo)
 	authService := auth.NewAuthService()
 	userHandler := handler.NewUserHandler(userService, authService)
 

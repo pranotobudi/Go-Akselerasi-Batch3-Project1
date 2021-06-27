@@ -14,12 +14,13 @@ import (
 )
 
 type movieHandler struct {
+	userService  service.UserServices
 	movieService service.MovieServices
 	authService  auth.AuthService
 }
 
-func NewMovieHandler(movieService service.MovieServices, authService auth.AuthService) *movieHandler {
-	return &movieHandler{movieService, authService}
+func NewMovieHandler(userService service.UserServices, movieService service.MovieServices, authService auth.AuthService) *movieHandler {
+	return &movieHandler{userService, movieService, authService}
 }
 
 func (h *movieHandler) AddGenre(c echo.Context) error {
@@ -171,16 +172,17 @@ func (h *movieHandler) AddMovieReview(c echo.Context) error {
 
 		return c.JSON(http.StatusBadRequest, response)
 	}
-
-	userData := service.MovieReviewResponseFormatter(newMovieReview)
+	user, _ := h.userService.GetUserByID(newMovieReview.UserID)
+	movie, _ := h.movieService.GetMovieByID(newMovieReview.MovieID)
+	userData := service.MovieReviewResponseFormatter(newMovieReview, *user, *movie)
 	response := helper.ResponseFormatter(http.StatusOK, "success", "movie review successfully added", userData)
 
 	return c.JSON(http.StatusOK, response)
 }
 
 func (h *movieHandler) GetMoviewReview(c echo.Context) error {
-	id, _ := strconv.Atoi(c.Param("id"))
-	movieReview, err := h.movieService.GetMovieReview(uint(id))
+	movieID, _ := strconv.Atoi(c.Param("id"))
+	movieReviews, err := h.movieService.GetMovieReview(uint(movieID))
 	if err != nil {
 		errorFormatter := helper.ErrorFormatter(err)
 		errorMessage := helper.M{"errors": errorFormatter}
@@ -194,8 +196,14 @@ func (h *movieHandler) GetMoviewReview(c echo.Context) error {
 
 	// 	return c.JSON(http.StatusInternalServerError, response)
 	// }
-	userData := service.MovieReviewResponseFormatter(*movieReview)
-	response := helper.ResponseFormatter(http.StatusOK, "success", "get movie review successfull", userData)
+	var finalData []service.ResponseMovieReview
+	for _, movieReview := range movieReviews {
+		user, _ := h.userService.GetUserByID(movieReview.UserID)
+		movie, _ := h.movieService.GetMovieByID(movieReview.MovieID)
+		moviewReviewData := service.MovieReviewResponseFormatter(movieReview, *user, *movie)
+		finalData = append(finalData, moviewReviewData)
+	}
+	response := helper.ResponseFormatter(http.StatusOK, "success", "get movie review successfull", finalData)
 
 	return c.JSON(http.StatusOK, response)
 }

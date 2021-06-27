@@ -23,8 +23,10 @@ func (r MovieRoutes) Route() []helper.Route {
 	// db.AutoMigrate(User{}, Role{}, Permission{}, RolePermission{}, movie.Genre{}, movie.Movie{}, movie.GenreMovie{}, movie.MovieReview{})
 	repo := repository.NewRepository(db)
 	movieService := service.NewMovieServices(repo)
+	userService := service.NewUserServices(repo)
+
 	authService := auth.NewAuthService()
-	movieHandler := handler.NewMovieHandler(movieService, authService)
+	movieHandler := handler.NewMovieHandler(userService, movieService, authService)
 
 	return []helper.Route{
 		{
@@ -85,10 +87,10 @@ func (r MovieRoutes) Route() []helper.Route {
 			Method:  echo.GET,
 			Path:    "/review/:id", // CHECK AGAIN
 			Handler: movieHandler.GetMoviewReview,
-			Middleware: []echo.MiddlewareFunc{
-				middleware.JwtMiddleWare(),
-				middleware.RoleAccessMiddleware("admin", "member"),
-			},
+			// Middleware: []echo.MiddlewareFunc{
+			// 	middleware.JwtMiddleWare(),
+			// 	middleware.RoleAccessMiddleware("admin", "member"),
+			// },
 		},
 	}
 }

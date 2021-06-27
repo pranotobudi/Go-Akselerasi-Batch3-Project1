@@ -20,15 +20,17 @@ type Repository interface {
 	GetAllGenres() ([]entity.Genre, error)
 	GetAllGenresByMovieID(movieID uint) ([]entity.Genre, error)
 	FindMovie(name string) *entity.Movie
+	GetMovieByID(id uint) (*entity.Movie, error)
 	AddMovie(movie entity.Movie) (entity.Movie, error)
 	GetAllMovies() ([]entity.Movie, error)
 	FindGenreMovie(genreID uint, movieID uint) *entity.GenreMovie
 	AddGenreMovie(genreMovie entity.GenreMovie) (entity.GenreMovie, error)
-	GetMovieReview(id uint) (*entity.MovieReview, error)
+	GetMovieReview(id uint) ([]entity.MovieReview, error)
 	AddMovieReview(movieReview entity.MovieReview) (entity.MovieReview, error)
 	FindRole(userID uint) (string, error)
 	GetAllUsers() ([]entity.User, error)
 	GetUser(email string) (*entity.User, error)
+	GetUserByID(id uint) (*entity.User, error)
 	GetRegistration(email string) (*entity.Registration, error)
 	UpdateUser(newUser entity.User) (entity.User, error)
 	AddRegistration(registration entity.Registration) (entity.Registration, error)
@@ -154,6 +156,15 @@ func (r *repository) FindMovie(title string) *entity.Movie {
 	}
 	return nil
 }
+
+func (r *repository) GetMovieByID(id uint) (*entity.Movie, error) {
+	var movie entity.Movie
+	err := r.db.First(&movie, "id=?", id).Error
+	if err == nil {
+		return &movie, err
+	}
+	return &movie, nil
+}
 func (r *repository) AddMovie(movie entity.Movie) (entity.Movie, error) {
 	err := r.db.Create(&movie).Error
 	if err != nil {
@@ -204,13 +215,13 @@ func (r *repository) AddMovieReview(movieReview entity.MovieReview) (entity.Movi
 	return movieReview, nil
 }
 
-func (r *repository) GetMovieReview(id uint) (*entity.MovieReview, error) {
-	var movieReview entity.MovieReview
-	err := r.db.First(&movieReview, "id=?", id).Error
+func (r *repository) GetMovieReview(movieID uint) ([]entity.MovieReview, error) {
+	var movieReviews []entity.MovieReview
+	err := r.db.Find(&movieReviews, "movie_id=?", movieID).Error
 	if err != nil {
-		return &movieReview, err
+		return movieReviews, err
 	}
-	return &movieReview, nil
+	return movieReviews, nil
 }
 
 func (r *repository) FindRole(userID uint) (string, error) {
@@ -241,6 +252,15 @@ func (r *repository) GetUser(email string) (*entity.User, error) {
 	}
 	return &user, nil
 }
+func (r *repository) GetUserByID(id uint) (*entity.User, error) {
+	var user entity.User
+	err := r.db.First(&user, "id=?", id).Error
+	if err != nil {
+		return &user, err
+	}
+	return &user, nil
+}
+
 func (r *repository) GetRegistration(email string) (*entity.Registration, error) {
 	var registration entity.Registration
 	err := r.db.First(&registration, "email=?", email).Error

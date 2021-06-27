@@ -17,6 +17,7 @@ type UserServices interface {
 	GetRole(userID uint) (string, error)
 	GetAllUsers() ([]entity.User, error)
 	GetUser(email string) (*entity.User, error)
+	GetUserByID(id uint) (*entity.User, error)
 	GetRegistration(email string) (*entity.Registration, error)
 	UpdateUser(req RequestUser) (entity.User, error)
 	CheckUserExists(req RequestUser) (bool, error)
@@ -27,7 +28,7 @@ type userServices struct {
 	repository repository.Repository
 }
 
-func NewServices(repository repository.Repository) *userServices {
+func NewUserServices(repository repository.Repository) *userServices {
 	return &userServices{repository}
 }
 
@@ -105,6 +106,14 @@ func (s *userServices) GetAllUsers() ([]entity.User, error) {
 
 func (s *userServices) GetUser(email string) (*entity.User, error) {
 	user, err := s.repository.GetUser(email)
+	if err != nil {
+		return user, err
+	}
+	return user, nil
+}
+
+func (s *userServices) GetUserByID(id uint) (*entity.User, error) {
+	user, err := s.repository.GetUserByID(id)
 	if err != nil {
 		return user, err
 	}

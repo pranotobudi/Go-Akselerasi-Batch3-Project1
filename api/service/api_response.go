@@ -23,13 +23,13 @@ type ResponseGenre struct {
 	// DeletedAt gorm.DeletedAt `json:"deleted_at"`
 }
 type ResponseMovie struct {
-	ID           uint                  `json:"id"`
-	UserID       uint                  `json:"user_id"`
-	Title        string                `json:"title"`
-	Year         int                   `json:"year"`
-	Rating       int                   `json:"rating"`
-	MovieReviews []ResponseMovieReview `json:"movie_reviews"`
-	Genres       []ResponseGenre       `json:"genres"`
+	ID           uint                 `json:"id"`
+	UserID       uint                 `json:"user_id"`
+	Title        string               `json:"title"`
+	Year         int                  `json:"year"`
+	Rating       int                  `json:"rating"`
+	MovieReviews []entity.MovieReview `json:"movie_reviews"`
+	Genres       []ResponseGenre      `json:"genres"`
 	// CreatedAt    time.Time            `json:"created_at"`
 	// UpdatedAt    time.Time            `json:"updated_at"`
 	// DeletedAt    gorm.DeletedAt       `json:"deleted_at"`
@@ -58,11 +58,13 @@ type ResponseGenreMovie struct {
 }
 
 type ResponseMovieReview struct {
-	ID      uint   `json:"id"`
-	UserID  uint   `json:"user_id"`
-	MovieID uint   `json:"movie_id"`
-	Review  string `json:"review"`
-	Rate    int    `json:"rate"`
+	ID      uint         `json:"id"`
+	UserID  uint         `json:"user_id"`
+	User    entity.User  `json:"user"`
+	MovieID uint         `json:"movie_id"`
+	Movie   entity.Movie `json:"movie"`
+	Review  string       `json:"review"`
+	Rate    int          `json:"rate"`
 	// CreatedAt time.Time      `json:"created_at"`
 	// UpdatedAt time.Time      `json:"updated_at"`
 	// DeletedAt gorm.DeletedAt `json:"deleted_at"`
@@ -95,11 +97,11 @@ func GenreResponseFormatter(genre entity.Genre) ResponseGenre {
 }
 
 func MovieResponseFormatter(movie entity.Movie, genres []entity.Genre) ResponseMovie {
-	var responseMovieReviews []ResponseMovieReview
+	var responseMovieReviews []entity.MovieReview
 	var responseGenres []ResponseGenre
 	for _, movieReview := range movie.MovieReviews {
-		responseMovieReview := MovieReviewResponseFormatter(movieReview)
-		responseMovieReviews = append(responseMovieReviews, responseMovieReview)
+		// responseMovieReview := MovieReviewResponseFormatter(movieReview, nil, nil)
+		responseMovieReviews = append(responseMovieReviews, movieReview)
 	}
 	for _, genre := range genres {
 		responseGenre := GenreResponseFormatter(genre)
@@ -132,12 +134,14 @@ func GenreMovieResponseFormatter(genreMovie entity.GenreMovie) ResponseGenreMovi
 	return formatter
 }
 
-func MovieReviewResponseFormatter(movieReview entity.MovieReview) ResponseMovieReview {
+func MovieReviewResponseFormatter(movieReview entity.MovieReview, user entity.User, movie entity.Movie) ResponseMovieReview {
 	formatter := ResponseMovieReview{
 
 		ID:      movieReview.ID,
 		UserID:  movieReview.UserID,
+		User:    user,
 		MovieID: movieReview.MovieID,
+		Movie:   movie,
 		Review:  movieReview.Review,
 		Rate:    movieReview.Rate,
 		// CreatedAt: movieReview.CreatedAt,

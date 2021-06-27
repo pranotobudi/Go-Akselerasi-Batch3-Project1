@@ -16,12 +16,13 @@ type MovieServices interface {
 	GetAllGenresByMovieID(movieID uint) ([]entity.Genre, error)
 	CheckExistsMovie(req RequestMovie) error
 	AddMovie(req RequestMovie) (entity.Movie, error)
+	GetMovieByID(id uint) (*entity.Movie, error)
 	GetAllMovies() ([]entity.Movie, error)
 	CheckExistsGenreMovie(req RequestGenreMovie) error
 	AddGenreMovie(req RequestGenreMovie) (entity.GenreMovie, error)
 	GetGenreMovie(req RequestGenreMovie) (*entity.GenreMovie, error)
 	AddMovieReview(req RequestMovieReview) (entity.MovieReview, error)
-	GetMovieReview(id uint) (*entity.MovieReview, error)
+	GetMovieReview(id uint) ([]entity.MovieReview, error)
 }
 
 type movieServices struct {
@@ -91,7 +92,13 @@ func (s *movieServices) AddMovie(req RequestMovie) (entity.Movie, error) {
 	return newMovie, nil
 
 }
-
+func (s *movieServices) GetMovieByID(id uint) (*entity.Movie, error) {
+	newMovie, err := s.repository.GetMovieByID(id)
+	if err != nil {
+		return newMovie, err
+	}
+	return newMovie, nil
+}
 func (s *movieServices) GetAllMovies() ([]entity.Movie, error) {
 	movies, err := s.repository.GetAllMovies()
 	// fmt.Printf("\n movieServices GetAllMovies: %+v \n", movies)
@@ -147,10 +154,10 @@ func (s *movieServices) AddMovieReview(req RequestMovieReview) (entity.MovieRevi
 
 }
 
-func (s *movieServices) GetMovieReview(id uint) (*entity.MovieReview, error) {
-	movieReview, err := s.repository.GetMovieReview(id)
+func (s *movieServices) GetMovieReview(movieID uint) ([]entity.MovieReview, error) {
+	movieReviews, err := s.repository.GetMovieReview(movieID)
 	if err != nil {
-		return movieReview, err
+		return movieReviews, err
 	}
-	return movieReview, nil
+	return movieReviews, nil
 }

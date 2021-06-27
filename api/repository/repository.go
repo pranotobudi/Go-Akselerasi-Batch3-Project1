@@ -15,8 +15,10 @@ type Repository interface {
 	FindEmail(email string) *entity.User
 	GetUserByEmail(email string) (entity.User, error)
 	FindGenre(name string) *entity.Genre
+	GetGenre(id uint) *entity.Genre
 	AddGenre(genre entity.Genre) (entity.Genre, error)
 	GetAllGenres() ([]entity.Genre, error)
+	GetAllGenresByMovieID(movieID uint) ([]entity.Genre, error)
 	FindMovie(name string) *entity.Movie
 	AddMovie(movie entity.Movie) (entity.Movie, error)
 	GetAllMovies() ([]entity.Movie, error)
@@ -77,6 +79,16 @@ func (r *repository) FindGenre(name string) *entity.Genre {
 	}
 	return nil
 }
+
+func (r *repository) GetGenre(id uint) *entity.Genre {
+	var genre entity.Genre
+	err := r.db.First(&genre, "id=?", id).Error
+	if err == nil {
+		return &genre
+	}
+	return nil
+}
+
 func (r *repository) AddGenre(genre entity.Genre) (entity.Genre, error) {
 	err := r.db.Create(&genre).Error
 	if err != nil {
@@ -115,6 +127,25 @@ func (r *repository) GetAllGenres() ([]entity.Genre, error) {
 
 }
 
+func (r *repository) GetAllGenresByMovieID(movieID uint) ([]entity.Genre, error) {
+	var genreMovies []entity.GenreMovie
+	var genres []entity.Genre
+	result := r.db.Find(&genreMovies, "movie_id = ?", movieID)
+	if result.Error != nil {
+		return nil, result.Error
+	} else if result.RowsAffected < 1 {
+		return nil, fmt.Errorf("table is empty")
+	}
+	for _, genreMovie := range genreMovies {
+		var genre entity.Genre
+		r.db.Find(&genre, "id = ?", genreMovie.GenreID)
+		genres = append(genres, genre)
+	}
+
+	return genres, nil
+
+}
+
 func (r *repository) FindMovie(title string) *entity.Movie {
 	var movie entity.Movie
 	err := r.db.First(&movie, "title=?", title).Error
@@ -134,7 +165,9 @@ func (r *repository) AddMovie(movie entity.Movie) (entity.Movie, error) {
 
 func (r *repository) GetAllMovies() ([]entity.Movie, error) {
 	var movies []entity.Movie
-	result := r.db.Find(&movies)
+	// result := r.db.Find(&movies)
+	result := r.db.Preload("MovieReviews").Preload("GenreMovies").Find(&movies)
+	// fmt.Printf("\n repository GetAllMovies: %+v \n", movies)
 	if result.Error != nil {
 		return movies, result.Error
 	} else if result.RowsAffected < 1 {
@@ -142,6 +175,7 @@ func (r *repository) GetAllMovies() ([]entity.Movie, error) {
 	}
 	return movies, nil
 }
+
 func (r *repository) FindGenreMovie(genreID uint, movieID uint) *entity.GenreMovie {
 	var genreMovie entity.GenreMovie
 	err := r.db.First(&genreMovie, "genre_id=? AND movie_id=?", genreID, movieID).Error

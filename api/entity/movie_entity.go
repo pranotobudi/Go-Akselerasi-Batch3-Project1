@@ -10,10 +10,12 @@ type Genre struct {
 
 type Movie struct {
 	gorm.Model
-	UserID uint
-	Title  string
-	Year   int
-	Rating int
+	UserID       uint
+	Title        string
+	Year         int
+	Rating       int
+	MovieReviews []MovieReview `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	GenreMovies  []GenreMovie  `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }
 
 type GenreMovie struct {

@@ -11,12 +11,15 @@ import (
 type MovieServices interface {
 	CheckExistsGenre(req RequestGenre) error
 	AddGenre(req RequestGenre) (entity.Genre, error)
+	GetGenre(req RequestGenre) (entity.Genre, error)
 	GetAllGenres() ([]entity.Genre, error)
+	GetAllGenresByMovieID(movieID uint) ([]entity.Genre, error)
 	CheckExistsMovie(req RequestMovie) error
 	AddMovie(req RequestMovie) (entity.Movie, error)
 	GetAllMovies() ([]entity.Movie, error)
 	CheckExistsGenreMovie(req RequestGenreMovie) error
 	AddGenreMovie(req RequestGenreMovie) (entity.GenreMovie, error)
+	GetGenreMovie(req RequestGenreMovie) (*entity.GenreMovie, error)
 	AddMovieReview(req RequestMovieReview) (entity.MovieReview, error)
 	GetMovieReview(id uint) (*entity.MovieReview, error)
 }
@@ -47,6 +50,12 @@ func (s *movieServices) AddGenre(req RequestGenre) (entity.Genre, error) {
 	}
 	return newGenre, nil
 }
+
+func (s *movieServices) GetGenre(req RequestGenre) (entity.Genre, error) {
+	var genre = entity.Genre{}
+	return genre, nil
+}
+
 func (s *movieServices) GetAllGenres() ([]entity.Genre, error) {
 	fmt.Println("===========MOVIE-SERVICES: GET-ALL-GENRES==============")
 	genres, err := s.repository.GetAllGenres()
@@ -55,7 +64,13 @@ func (s *movieServices) GetAllGenres() ([]entity.Genre, error) {
 	}
 	return genres, nil
 }
-
+func (s *movieServices) GetAllGenresByMovieID(movieID uint) ([]entity.Genre, error) {
+	genres, err := s.repository.GetAllGenresByMovieID(movieID)
+	if err != nil {
+		return genres, err
+	}
+	return genres, nil
+}
 func (s *movieServices) CheckExistsMovie(req RequestMovie) error {
 	title := req.Title
 	if movie := s.repository.FindMovie(title); movie != nil {
@@ -79,6 +94,7 @@ func (s *movieServices) AddMovie(req RequestMovie) (entity.Movie, error) {
 
 func (s *movieServices) GetAllMovies() ([]entity.Movie, error) {
 	movies, err := s.repository.GetAllMovies()
+	// fmt.Printf("\n movieServices GetAllMovies: %+v \n", movies)
 	if err != nil {
 		return movies, err
 	}
@@ -104,6 +120,15 @@ func (s *movieServices) AddGenreMovie(req RequestGenreMovie) (entity.GenreMovie,
 		return newGenreMovie, err
 	}
 	return newGenreMovie, nil
+
+}
+
+func (s *movieServices) GetGenreMovie(req RequestGenreMovie) (*entity.GenreMovie, error) {
+	genreMovie := s.repository.FindGenreMovie(req.GenreID, req.MovieID)
+	if genreMovie != nil {
+		return genreMovie, errors.New("genre for this Movie already inserted")
+	}
+	return genreMovie, nil
 
 }
 

@@ -58,10 +58,10 @@ func (r MovieRoutes) Route() []helper.Route {
 			Method:  echo.GET,
 			Path:    "/movie", // PASS
 			Handler: movieHandler.GetAllMovies,
-			Middleware: []echo.MiddlewareFunc{
-				middleware.JwtMiddleWare(),
-				middleware.RoleAccessMiddleware("admin", "member"),
-			},
+			// Middleware: []echo.MiddlewareFunc{
+			// 	middleware.JwtMiddleWare(),
+			// 	middleware.RoleAccessMiddleware("admin", "member"),
+			// },
 		},
 		{
 			Method:  echo.POST,

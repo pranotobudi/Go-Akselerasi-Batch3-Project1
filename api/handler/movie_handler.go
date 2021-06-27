@@ -95,7 +95,8 @@ func (h *movieHandler) AddMovie(c echo.Context) error {
 
 		return c.JSON(http.StatusBadRequest, response)
 	}
-	userData := service.MovieResponseFormatter(newMovie)
+	genres, _ := h.movieService.GetAllGenresByMovieID(newMovie.ID)
+	userData := service.MovieResponseFormatter(newMovie, genres)
 	response := helper.ResponseFormatter(http.StatusOK, "success", "movie successfully added", userData)
 
 	return c.JSON(http.StatusOK, response)
@@ -103,6 +104,8 @@ func (h *movieHandler) AddMovie(c echo.Context) error {
 
 func (h *movieHandler) GetAllMovies(c echo.Context) error {
 	movies, err := h.movieService.GetAllMovies()
+	fmt.Printf("\n movieHandler GetAllMovies: %+v \n", movies)
+
 	if err != nil {
 		errorFormatter := helper.ErrorFormatter(err)
 		errorMessage := helper.M{"errors": errorFormatter}
@@ -118,7 +121,8 @@ func (h *movieHandler) GetAllMovies(c echo.Context) error {
 	// }
 	var finalUserData []service.ResponseMovie
 	for _, movie := range movies {
-		userData := service.MovieResponseFormatter(movie)
+		genres, _ := h.movieService.GetAllGenresByMovieID(movie.ID)
+		userData := service.MovieResponseFormatter(movie, genres)
 		finalUserData = append(finalUserData, userData)
 	}
 	response := helper.ResponseFormatter(http.StatusOK, "success", "get all movies succeeded", finalUserData)

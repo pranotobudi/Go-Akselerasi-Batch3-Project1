@@ -81,6 +81,7 @@ func (s *movieServices) CheckExistsMovie(req RequestMovie) error {
 }
 func (s *movieServices) AddMovie(req RequestMovie) (entity.Movie, error) {
 	movie := entity.Movie{}
+	movie.UserID = req.UserID
 	movie.Title = req.Title
 	movie.Year = req.Year
 	movie.Rating = req.Rating

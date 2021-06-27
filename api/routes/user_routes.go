@@ -47,11 +47,19 @@ func (r UserRoutes) Route() []helper.Route {
 			Method:  echo.GET,
 			Path:    "/users",
 			Handler: userHandler.GetAllUsers,
+			Middleware: []echo.MiddlewareFunc{
+				middleware.JwtMiddleWare(),
+				middleware.RoleAccessMiddleware("admin"),
+			},
 		},
 		{
 			Method:  echo.GET,
 			Path:    "/user",
 			Handler: userHandler.GetUser,
+			Middleware: []echo.MiddlewareFunc{
+				middleware.JwtMiddleWare(),
+				middleware.RoleAccessMiddleware("admin"),
+			},
 		},
 		{
 			Method:  echo.PUT,
